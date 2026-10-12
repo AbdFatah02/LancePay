@@ -58,7 +58,7 @@ async function attemptWebhookDelivery(params: {
   statusCode?: number
   error?: string
 }> {
-  const { payload, targetUrl, signingSecret, eventType } = params
+  const {} = await params
 
   try {
     const signature = generateWebhookSignature(payload, signingSecret)
@@ -111,7 +111,7 @@ async function attemptWebhookDelivery(params: {
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: any,
 ) {
   try {
     const authHeader = request.headers.get('authorization')

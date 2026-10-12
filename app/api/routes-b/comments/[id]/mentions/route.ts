@@ -39,7 +39,7 @@ async function getAuthenticatedUserId(request: NextRequest): Promise<string | nu
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: any,
 ) {
   const userId = await getAuthenticatedUserId(request)
   if (!userId) {

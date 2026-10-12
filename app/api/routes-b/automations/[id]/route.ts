@@ -40,7 +40,7 @@ const SELECT_FIELDS = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: any,
 ) {
   const userId = await getAuthenticatedUserId(request)
   if (!userId) {
@@ -67,7 +67,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: any,
 ) {
   const userId = await getAuthenticatedUserId(request)
   if (!userId) {
@@ -159,7 +159,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: any,
 ) {
   const userId = await getAuthenticatedUserId(request)
   if (!userId) {

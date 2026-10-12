@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; contactId: string } }
+  { params }: any
 ) {
   try {
     const authToken = request.headers.get('authorization')?.replace('Bearer ', '')

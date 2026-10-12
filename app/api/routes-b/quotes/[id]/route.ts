@@ -18,7 +18,7 @@ const SELECT_FIELDS = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const authToken = request.headers.get('authorization')?.replace('Bearer ', '')

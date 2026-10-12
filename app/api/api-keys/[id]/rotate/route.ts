@@ -8,7 +8,7 @@ const GRACE_PERIOD_MS = 24 * 60 * 60 * 1000
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   const authToken = request.headers.get('authorization')?.replace('Bearer ', '')
   const claims = await verifyAuthToken(authToken || '')

@@ -16,7 +16,7 @@ const CreateAllocationSchema = z.object({
 
 async function GETHandler(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const auth = await requireScope(request, 'routes-b:read')
@@ -58,7 +58,7 @@ async function GETHandler(
 
 async function POSTHandler(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const auth = await requireScope(request, 'routes-b:read')

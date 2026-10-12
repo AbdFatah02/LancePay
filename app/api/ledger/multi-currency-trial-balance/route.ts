@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const params = new URL(request.url).searchParams
-    const reportingCurrency = (params.get('reportingCurrency') ?? 'USDC').toUpperCase()
+    const reportingCurrency = (params.get('reportingCurrency') || 'USDC').toUpperCase()
     if (!SUPPORTED_CURRENCIES.includes(reportingCurrency as (typeof SUPPORTED_CURRENCIES)[number])) {
       return NextResponse.json({ error: 'reportingCurrency must be USDC or NGN' }, { status: 400 })
     }
@@ -60,8 +60,8 @@ export async function GET(request: NextRequest) {
     const accounts: Record<string, { debits: number; credits: number }> = {}
     for (const entry of entries) {
       const amount = Number(entry.amount) * (entry.currency === reportingCurrency ? 1 : rate)
-      accounts[entry.debitAccount] ??= { debits: 0, credits: 0 }
-      accounts[entry.creditAccount] ??= { debits: 0, credits: 0 }
+      accounts[entry.debitAccount] ||= { debits: 0, credits: 0 }
+      accounts[entry.creditAccount] ||= { debits: 0, credits: 0 }
       accounts[entry.debitAccount].debits += amount
       accounts[entry.creditAccount].credits += amount
     }
