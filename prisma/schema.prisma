@@ -988,17 +988,21 @@ model InvoiceCollaborator {
 }
 
 model PayoutBatch {
-  id              String    @id @default(uuid())
-  userId          String
-  status          String    @default("pending")
-  totalAmount     Decimal   @db.Decimal(18, 6)
-  totalRecipients Int
-  successCount    Int       @default(0)
-  failedCount     Int       @default(0)
-  results         Json      @default("[]")
-  scheduledAt     DateTime? // optional timestamp when payout should be executed
-  createdAt       DateTime  @default(now())
-  completedAt     DateTime?
+  id                 String    @id @default(uuid())
+  userId             String
+  status             String    @default("pending")
+  totalAmount        Decimal   @db.Decimal(18, 6)
+  totalRecipients    Int
+  successCount       Int       @default(0)
+  failedCount        Int       @default(0)
+  results            Json      @default("[]")
+  scheduledAt        DateTime? // optional timestamp when payout should be executed
+  createdAt          DateTime  @default(now())
+  completedAt        DateTime?
+  // Audit trail for POST /api/payout-batches/[id]/cancel
+  cancelledAt        DateTime?
+  cancellationReason String?   @db.Text
+  cancelledById      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
