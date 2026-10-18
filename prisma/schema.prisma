@@ -48,6 +48,10 @@ model User {
   apiKeys                           ApiKey[]
   sandboxSessions                   SandboxSession[]
   featureFlagsCreated               FeatureFlag[]                      @relation("FeatureFlagsCreated")
+  featureFlagChanges                FeatureFlagChange[]
+  killSwitchesEngaged               KillSwitch[]                       @relation("KillSwitchesEngaged")
+  killSwitchesDisengaged            KillSwitch[]                       @relation("KillSwitchesDisengaged")
+  incidentsCreated                  Incident[]                         @relation("IncidentsCreated")
   adminImpersonations               ImpersonationSession[]             @relation("AdminImpersonationSessions")
   targetImpersonations              ImpersonationSession[]             @relation("TargetImpersonationSessions")
   brandingSettings                  BrandingSettings?
@@ -2200,22 +2204,44 @@ model PersistedQuery {
 }
 
 model FeatureFlag {
-  id          String   @id @default(uuid())
-  key         String   @unique @db.VarChar(100)
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
-  cohortRules Json     @default("[]")
-  enabled     Boolean  @default(false)
-  archived    Boolean  @default(false)
-  createdById String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String              @id @default(uuid())
+  key               String              @unique @db.VarChar(100)
+  name              String              @db.VarChar(255)
+  description       String?             @db.Text
+  rolloutPercentage Int                 @default(0)
+  cohortRules       Json                @default("[]")
+  enabled           Boolean             @default(false)
+  killed            Boolean             @default(false)
+  archived          Boolean             @default(false)
+  version           Int                 @default(1)
+  changeLog         Json                @default("[]")
+  createdById       String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
-  createdBy   User     @relation("FeatureFlagsCreated", fields: [createdById], references: [id])
+  createdBy         User                @relation("FeatureFlagsCreated", fields: [createdById], references: [id])
+  changes           FeatureFlagChange[]
 
   @@index([key])
   @@index([createdById])
   @@index([archived])
+}
+
+model FeatureFlagChange {
+  id            String      @id @default(uuid())
+  featureFlagId String
+  changedById   String
+  action        String      @db.VarChar(50)
+  priorConfig   Json
+  newConfig     Json
+  reason        String?     @db.Text
+  createdAt     DateTime    @default(now())
+
+  featureFlag   FeatureFlag @relation(fields: [featureFlagId], references: [id], onDelete: Cascade)
+  changedBy     User        @relation(fields: [changedById], references: [id])
+
+  @@index([featureFlagId])
+  @@index([changedById])
 }
 
 model ImpersonationSession {
@@ -2234,5 +2260,46 @@ model ImpersonationSession {
   @@index([adminId])
   @@index([targetUserId])
   @@index([expiresAt])
+}
+
+model KillSwitch {
+  id              String    @id @default(uuid())
+  key             String    @unique @db.VarChar(100)
+  subsystem       String    @db.VarChar(100)
+  status          String    @default("disengaged") @db.VarChar(20)
+  incidentRef     String?   @db.VarChar(100)
+  beforeSnapshot  Json?
+  afterSnapshot   Json?
+  engagedAt       DateTime?
+  engagedById     String?
+  disengagedAt    DateTime?
+  disengagedById  String?
+  elapsedSeconds  Int?
+  reason          String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  engagedBy       User?     @relation("KillSwitchesEngaged", fields: [engagedById], references: [id])
+  disengagedBy    User?     @relation("KillSwitchesDisengaged", fields: [disengagedById], references: [id])
+
+  @@index([key])
+  @@index([status])
+}
+
+model Incident {
+  id          String    @id @default(uuid())
+  reference   String    @unique @db.VarChar(100)
+  title       String    @db.VarChar(255)
+  status      String    @default("open") @db.VarChar(20)
+  severity    String    @default("high") @db.VarChar(20)
+  createdById String?
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy   User?     @relation("IncidentsCreated", fields: [createdById], references: [id])
+
+  @@index([reference])
+  @@index([status])
 }
 
